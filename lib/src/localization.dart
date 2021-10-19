@@ -44,13 +44,14 @@ class Localization {
     List<String>? args,
     Map<String, String>? namedArgs,
     String? gender,
+    int? elementAt,
   }) {
     late String res;
 
     if (gender != null) {
-      res = _gender(key, gender: gender);
+      res = _gender(key, elementAt, gender: gender);
     } else {
-      res = _resolve(key);
+      res = _resolve(key, elementAt);
     }
 
     res = _replaceLinks(res);
@@ -60,7 +61,7 @@ class Localization {
     return _replaceArgs(res, args);
   }
 
-  String _replaceLinks(String res, {bool logging = true}) {
+  String _replaceLinks(String res, {bool logging = true, int? elementAt}) {
     // TODO: add recursion detection and a resolve stack.
     final matches = _linkKeyMatcher.allMatches(res);
     var result = res;
@@ -75,7 +76,7 @@ class Localization {
       final linkPlaceholder =
           link.replaceAll(linkPrefix, '').replaceAll(_bracketsMatcher, '');
 
-      var translated = _resolve(linkPlaceholder);
+      var translated = _resolve(linkPlaceholder, elementAt);
 
       if (formatterName != null) {
         if (_modifiers.containsKey(formatterName)) {
@@ -114,7 +115,7 @@ class Localization {
   }
 
   String plural(String key, num value,
-      {List<String>? args, NumberFormat? format}) {
+      {List<String>? args, NumberFormat? format, int? elementAt}) {
     late var pluralCase;
     late var res;
     var pluralRule = _pluralRule(_locale.languageCode, value);
@@ -133,22 +134,22 @@ class Localization {
     }
     switch (pluralCase) {
       case PluralCase.ZERO:
-        res = _resolvePlural(key, 'zero');
+        res = _resolvePlural(key, 'zero', elementAt);
         break;
       case PluralCase.ONE:
-        res = _resolvePlural(key, 'one');
+        res = _resolvePlural(key, 'one', elementAt);
         break;
       case PluralCase.TWO:
-        res = _resolvePlural(key, 'two');
+        res = _resolvePlural(key, 'two', elementAt);
         break;
       case PluralCase.FEW:
-        res = _resolvePlural(key, 'few');
+        res = _resolvePlural(key, 'few', elementAt);
         break;
       case PluralCase.MANY:
-        res = _resolvePlural(key, 'many');
+        res = _resolvePlural(key, 'many', elementAt);
         break;
       case PluralCase.OTHER:
-        res = _resolvePlural(key, 'other');
+        res = _resolvePlural(key, 'other', elementAt);
         break;
       default:
         throw ArgumentError.value(value, 'howMany', 'Invalid plural argument');
@@ -158,21 +159,21 @@ class Localization {
         res, args ?? [format == null ? '$value' : format.format(value)]);
   }
 
-  String _gender(String key, {required String gender}) {
-    return _resolve(key + '.$gender');
+  String _gender(String key, int? elementAt, {required String gender}) {
+    return _resolve(key + '.$gender', elementAt);
   }
 
-  String _resolvePlural(String key, String subKey) {
+  String _resolvePlural(String key, String subKey, int? elementAt) {
     final tag = '$key.$subKey';
-    var resource = _resolve(tag);
+    var resource = _resolve(tag, elementAt);
     if (resource == tag && subKey != 'other') {
-      resource = _resolve('$key.other');
+      resource = _resolve('$key.other', elementAt);
     }
     return resource;
   }
 
-  String _resolve(String key, {bool logging = true}) {
-    var resource = _translations?.get(key);
+  String _resolve(String key, int? elementAt, {bool logging = true}) {
+    var resource = _translations?.get(key, elementAt);
     if (resource == null) {
       if (logging) {
         EasyLocalization.logger.warning('Localization key [$key] not found');
@@ -180,7 +181,7 @@ class Localization {
       if (_fallbackTranslations == null) {
         return key;
       } else {
-        resource = _fallbackTranslations?.get(key);
+        resource = _fallbackTranslations?.get(key, elementAt);
         if (resource == null) {
           if (logging) {
             EasyLocalization.logger

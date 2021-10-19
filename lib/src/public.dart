@@ -36,8 +36,15 @@ String tr(
   List<String>? args,
   Map<String, String>? namedArgs,
   String? gender,
+  int? elementAt,
 }) {
-  return Localization.instance.tr(key, args: args, namedArgs: namedArgs, gender: gender);
+  return Localization.instance.tr(
+    key,
+    args: args,
+    namedArgs: namedArgs,
+    gender: gender,
+    elementAt: elementAt,
+  );
 }
 
 /// {@template plural}

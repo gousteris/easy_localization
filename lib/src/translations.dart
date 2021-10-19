@@ -3,7 +3,7 @@ class Translations {
   final Map<String?, dynamic> _nestedKeysCache;
 
   Translations(this._translations) : _nestedKeysCache = {};
-  String? get(String key) {
+  String? get(String key, int? elementAt) {
     String? returnValue;
 
     /// Try to look it up as a nested key
@@ -13,7 +13,11 @@ class Translations {
 
     /// If we failed to find the key as a nested key, then fall back
     /// to looking it up like normal.
-    returnValue ??= _translations?[key];
+    if (elementAt != null) {
+      returnValue ??= _translations?[key][elementAt];
+    } else {
+      returnValue ??= _translations?[key];
+    }
 
     return returnValue;
   }

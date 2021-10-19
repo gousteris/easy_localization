@@ -75,8 +75,13 @@ extension StringTranslateExtension on String {
     List<String>? args,
     Map<String, String>? namedArgs,
     String? gender,
+    int? elementAt,
   }) =>
-      ez.tr(this, args: args, namedArgs: namedArgs, gender: gender);
+      ez.tr(this,
+          args: args,
+          namedArgs: namedArgs,
+          gender: gender,
+          elementAt: elementAt);
 
   /// {@macro plural}
   String plural(

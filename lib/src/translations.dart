@@ -22,7 +22,7 @@ class Translations {
   }
 
   String? getNested(String key, int? elementAt) {
-    if (isNestedCached(key)) return _nestedKeysCache[key];
+    if (elementAt == null && isNestedCached(key)) return _nestedKeysCache[key];
 
     final keys = key.split('.');
     final kHead = keys.first;
